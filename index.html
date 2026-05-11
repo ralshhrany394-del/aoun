@@ -44,6 +44,9 @@ body,html{height:100%;width:100%;overflow:hidden;font-family:'AraHamah',sans-ser
 .extra-links a{color:#406E8F;text-decoration:none;font-size:.95rem;cursor:pointer}
 .extra-links a:hover{text-decoration:underline}
 .form-title{text-align:center;color:#406E8F;font-size:15px;margin-bottom:20px;line-height:1.6}
+.otp-boxes{display:flex;gap:10px;justify-content:center;margin-bottom:20px;direction:ltr}
+.otp-box{width:45px;height:55px;border:2px solid #406E8F;border-radius:10px;font-size:1.5rem;font-weight:bold;text-align:center;outline:none;font-family:'AraHamah',sans-serif;color:#406E8F;transition:.2s}
+.otp-box:focus{border-color:#2e516b;background:#f0f6ff;box-shadow:0 0 0 3px rgba(64,110,143,.15)}
 .success-msg,.error-msg{border-radius:10px;padding:12px;margin-top:15px;font-size:14px;text-align:center;display:none}
 .success-msg.show{display:block;background:#e6f4ea;color:#2d6a3f;border:1px solid #a8d5b5}
 .error-msg.show{display:block;background:#fdecea;color:#a61c00;border:1px solid #f5c6c6}
@@ -65,6 +68,8 @@ body,html{height:100%;width:100%;overflow:hidden;font-family:'AraHamah',sans-ser
     <div class="right-panel">
         <img id="profile-avatar" src="avatar_device.jpg" class="profile-pic" alt="عون">
         <div class="form-container">
+
+            <!-- تسجيل الدخول -->
             <div id="login-form" class="form-content active">
                 <div class="input-group"><input type="email" id="login-email" placeholder="البريد الإلكتروني"></div>
                 <div class="input-group"><input type="password" id="login-password" placeholder="كلمة المرور"></div>
@@ -72,6 +77,8 @@ body,html{height:100%;width:100%;overflow:hidden;font-family:'AraHamah',sans-ser
                 <button class="action-btn" id="login-btn" onclick="handleLogin()">دخول</button>
                 <div class="extra-links"><a onclick="showForm('reset-request')">نسيت كلمة المرور؟</a></div>
             </div>
+
+            <!-- إنشاء حساب -->
             <div id="signup-form" class="form-content">
                 <div class="input-group"><input type="text" id="signup-user" placeholder="اسم المستخدم"></div>
                 <div class="input-group"><input type="email" id="signup-email" placeholder="البريد الإلكتروني"></div>
@@ -85,14 +92,35 @@ body,html{height:100%;width:100%;overflow:hidden;font-family:'AraHamah',sans-ser
                 <div id="signup-success" class="success-msg"></div>
                 <button class="action-btn" id="signup-btn" onclick="handleSignUp()">إنشاء حساب</button>
             </div>
+
+            <!-- الخطوة 1: إدخال البريد -->
             <div id="reset-request-form" class="form-content">
-                <p class="form-title">أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين</p>
+                <p class="form-title">أدخل بريدك الإلكتروني وسنرسل لك رمز التحقق</p>
                 <div class="input-group"><input type="email" id="reset-email" placeholder="البريد الإلكتروني"></div>
                 <div id="reset-request-error" class="error-msg"></div>
                 <div id="reset-request-success" class="success-msg"></div>
-                <button class="action-btn" id="reset-request-btn" onclick="handleResetRequest()">إرسال الرابط</button>
+                <button class="action-btn" id="reset-request-btn" onclick="handleResetRequest()">إرسال الرمز</button>
                 <div class="extra-links" style="margin-top:15px"><a onclick="showForm('login')">← العودة لتسجيل الدخول</a></div>
             </div>
+
+            <!-- الخطوة 2: إدخال الرمز -->
+            <div id="reset-otp-form" class="form-content">
+                <p class="form-title">أدخل الرمز المكون من 6 أرقام الذي أُرسل إلى بريدك</p>
+                <div class="otp-boxes">
+                    <input class="otp-box" id="otp1" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,'otp2')" onkeydown="otpBack(event,this,'')">
+                    <input class="otp-box" id="otp2" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,'otp3')" onkeydown="otpBack(event,this,'otp1')">
+                    <input class="otp-box" id="otp3" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,'otp4')" onkeydown="otpBack(event,this,'otp2')">
+                    <input class="otp-box" id="otp4" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,'otp5')" onkeydown="otpBack(event,this,'otp3')">
+                    <input class="otp-box" id="otp5" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,'otp6')" onkeydown="otpBack(event,this,'otp4')">
+                    <input class="otp-box" id="otp6" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,'')" onkeydown="otpBack(event,this,'otp5')">
+                </div>
+                <div id="reset-otp-error" class="error-msg"></div>
+                <div id="reset-otp-success" class="success-msg"></div>
+                <button class="action-btn" id="reset-otp-btn" onclick="handleVerifyOTP()">تحقق من الرمز</button>
+                <div class="extra-links" style="margin-top:15px"><a onclick="resendOTP()">إعادة إرسال الرمز</a></div>
+            </div>
+
+            <!-- الخطوة 3: كلمة المرور الجديدة -->
             <div id="reset-new-form" class="form-content">
                 <p class="form-title">أدخل كلمة المرور الجديدة</p>
                 <div class="input-group"><input type="password" id="new-pass" placeholder="كلمة المرور الجديدة"></div>
@@ -101,6 +129,7 @@ body,html{height:100%;width:100%;overflow:hidden;font-family:'AraHamah',sans-ser
                 <div id="reset-new-success" class="success-msg"></div>
                 <button class="action-btn" id="reset-new-btn" onclick="handleResetNew()">حفظ كلمة المرور الجديدة</button>
             </div>
+
         </div>
     </div>
 </div>
@@ -112,6 +141,8 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const _supabase=supabase.createClient(SB_URL,SB_KEY);
 const avatar=document.getElementById('profile-avatar');
 const splash=document.getElementById('splashScreen'),auth=document.getElementById('authScreen');
+let resetEmail='';
+
 function showAuth(){splash.classList.add('slide-up');auth.classList.add('visible')}
 splash.addEventListener('click',showAuth);
 let touchStartY=0,mouseStartY=0;
@@ -119,11 +150,12 @@ splash.addEventListener('touchstart',e=>{touchStartY=e.touches[0].clientY});
 splash.addEventListener('touchend',e=>{if(touchStartY-e.changedTouches[0].clientY>50)showAuth()});
 splash.addEventListener('mousedown',e=>{mouseStartY=e.clientY});
 splash.addEventListener('mouseup',e=>{if(mouseStartY-e.clientY>50)showAuth()});
+
 window.addEventListener('load',async()=>{
     const{data:{session}}=await _supabase.auth.getSession();
-    if(session){window.location.href='home.html';return}
-    if(window.location.hash.includes('type=recovery')){showAuth();showForm('reset-new')}
+    if(session) window.location.href='home.html';
 });
+
 let selectedGender='male';
 function selectGender(g){
     selectedGender=g;
@@ -131,15 +163,32 @@ function selectGender(g){
     document.getElementById('gender-female').classList.toggle('selected',g==='female');
     avatar.src=g==='female'?'avatar_female.jpg':'avatar_male.jpg';
 }
-const allForms=['login','signup','reset-request','reset-new'];
+
+const allForms=['login','signup','reset-request','reset-otp','reset-new'];
 function showForm(type){
     allForms.forEach(f=>document.getElementById(f+'-form').classList.toggle('active',f===type));
     document.getElementById('login-tab').className=type==='login'?'side-title active':'side-title inactive';
     document.getElementById('signup-tab').className=type==='signup'?'side-title active':'side-title inactive';
     avatar.src=type==='signup'?(selectedGender==='female'?'avatar_female.jpg':'avatar_male.jpg'):'avatar_device.jpg';
-    document.querySelectorAll('.error-msg, .success-msg').forEach(el=>{el.classList.remove('show');el.textContent=''});
+    document.querySelectorAll('.error-msg,.success-msg').forEach(el=>{el.classList.remove('show');el.textContent=''});
 }
-function showMsg(id,text,type){const el=document.getElementById(id);el.textContent=text;el.className=(type==='success'?'success-msg':'error-msg')+' show'}
+
+function showMsg(id,text,type){
+    const el=document.getElementById(id);
+    el.textContent=text;
+    el.className=(type==='success'?'success-msg':'error-msg')+' show';
+}
+
+// OTP navigation
+function otpNext(el,nextId){
+    el.value=el.value.replace(/\D/g,'').slice(0,1);
+    if(el.value&&nextId) document.getElementById(nextId)?.focus();
+}
+function otpBack(e,el,prevId){
+    if(e.key==='Backspace'&&!el.value&&prevId) document.getElementById(prevId)?.focus();
+}
+
+// إنشاء حساب
 async function handleSignUp(){
     const email=document.getElementById('signup-email').value.trim();
     const password=document.getElementById('signup-pass').value;
@@ -163,6 +212,8 @@ async function handleSignUp(){
         btn.disabled=false;btn.textContent='إنشاء حساب';
     }
 }
+
+// تسجيل الدخول
 async function handleLogin(){
     const email=document.getElementById('login-email').value.trim();
     const password=document.getElementById('login-password').value;
@@ -177,14 +228,79 @@ async function handleLogin(){
         btn.disabled=false;btn.textContent='دخول';
     }else{window.location.href='home.html'}
 }
+
+// إرسال OTP
+async function sendOTP(email){
+    const res=await fetch(`${SB_URL}/functions/v1/send-otp`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','apikey':SB_KEY},
+        body:JSON.stringify({email})
+    });
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error||'فشل الإرسال');
+    return data;
+}
+
+// الخطوة 1: إرسال الرمز
 async function handleResetRequest(){
     const email=document.getElementById('reset-email').value.trim();
     if(!email) return showMsg('reset-request-error','يرجى إدخال البريد الإلكتروني','error');
     const btn=document.getElementById('reset-request-btn');btn.disabled=true;btn.textContent='جاري الإرسال...';
-    const{error}=await _supabase.auth.resetPasswordForEmail(email,{redirectTo:window.location.href.split('#')[0]});
-    if(error){showMsg('reset-request-error','خطأ: '+error.message,'error');btn.disabled=false;btn.textContent='إرسال الرابط'}
-    else{showMsg('reset-request-success','تم الإرسال! افتح بريدك واضغط على الرابط.','success');btn.textContent='تم الإرسال'}
+    try{
+        await sendOTP(email);
+        resetEmail=email;
+        showMsg('reset-request-success','تم الإرسال! تحقق من بريدك الإلكتروني.','success');
+        setTimeout(()=>showForm('reset-otp'),1500);
+    }catch(err){
+        showMsg('reset-request-error','خطأ: '+err.message,'error');
+        btn.disabled=false;btn.textContent='إرسال الرمز';
+    }
 }
+
+// إعادة إرسال الرمز
+async function resendOTP(){
+    if(!resetEmail) return showForm('reset-request');
+    try{
+        await sendOTP(resetEmail);
+        showMsg('reset-otp-success','تم إعادة الإرسال! تحقق من بريدك.','success');
+        // تصفير الخانات
+        ['otp1','otp2','otp3','otp4','otp5','otp6'].forEach(id=>{document.getElementById(id).value=''});
+        document.getElementById('otp1').focus();
+    }catch(err){
+        showMsg('reset-otp-error','خطأ: '+err.message,'error');
+    }
+}
+
+// الخطوة 2: التحقق من الرمز
+async function handleVerifyOTP(){
+    const digits=['otp1','otp2','otp3','otp4','otp5','otp6'].map(id=>document.getElementById(id).value.trim());
+    const otp=digits.join('');
+    if(otp.length!==6||digits.some(d=>!/^\d$/.test(d)))
+        return showMsg('reset-otp-error','يرجى إدخال الرمز كاملاً (6 أرقام)','error');
+
+    const btn=document.getElementById('reset-otp-btn');
+    btn.disabled=true;btn.textContent='جاري التحقق...';
+
+    // التحقق من الوقت يصير في قاعدة البيانات مباشرة
+    const{data,error}=await _supabase.from('otp_codes')
+        .select('*')
+        .eq('email',resetEmail)
+        .eq('code',otp)
+        .eq('used',false)
+        .gt('expires_at','now()')
+        .single();
+
+    if(error||!data){
+        showMsg('reset-otp-error','الرمز غير صحيح أو منتهي الصلاحية','error');
+        btn.disabled=false;btn.textContent='تحقق من الرمز';
+        return;
+    }
+
+    await _supabase.from('otp_codes').update({used:true}).eq('id',data.id);
+    showForm('reset-new');
+}
+
+// الخطوة 3: تغيير كلمة المرور
 async function handleResetNew(){
     const newPass=document.getElementById('new-pass').value;
     const confirmPass=document.getElementById('confirm-pass').value;
@@ -192,9 +308,28 @@ async function handleResetNew(){
     if(newPass.length<6) return showMsg('reset-new-error','يجب أن تكون كلمة المرور 6 أحرف على الأقل','error');
     if(newPass!==confirmPass) return showMsg('reset-new-error','كلمة المرور وتأكيدها لا يتطابقان','error');
     const btn=document.getElementById('reset-new-btn');btn.disabled=true;btn.textContent='جاري الحفظ...';
-    const{error}=await _supabase.auth.updateUser({password:newPass});
-    if(error){showMsg('reset-new-error','خطأ: '+error.message,'error');btn.disabled=false;btn.textContent='حفظ كلمة المرور الجديدة'}
-    else{showMsg('reset-new-success','تم التغيير! جاري التحويل...','success');setTimeout(()=>window.location.href='home.html',2000)}
+    try{
+        // تحديث في Supabase Auth
+        const res=await fetch(`${SB_URL}/functions/v1/send-otp`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json','apikey':SB_KEY},
+            body:JSON.stringify({email:resetEmail,newPassword:newPass,action:'update_password'})
+        });
+        const data=await res.json();
+        if(!res.ok) throw new Error(data.error||'فشل التحديث');
+
+        // تحديث في جدول users
+        await _supabase.from('users').update({password:newPass}).eq('email',resetEmail);
+
+        showMsg('reset-new-success','تم تغيير كلمة المرور بنجاح! جاري التحويل...','success');
+        setTimeout(()=>{
+            showForm('login');
+            document.getElementById('login-email').value=resetEmail;
+        },2000);
+    }catch(err){
+        showMsg('reset-new-error','خطأ: '+err.message,'error');
+        btn.disabled=false;btn.textContent='حفظ كلمة المرور الجديدة';
+    }
 }
 </script>
 </body>
