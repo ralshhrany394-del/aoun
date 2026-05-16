@@ -100,7 +100,7 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const _supabase=supabase.createClient(SB_URL,SB_KEY);
 let currentUser=null;
 
-const ICONS={low_heart_rate:'❤️',high_heart_rate:'❤️',low_battery:'🚨',low_oxygen:'🫁',achievement:'🏆',medication:'💊',fall:'⚠️',general:'🔔'};
+const ICONS={low_heart_rate:'❤️',high_heart_rate:'❤️',low_battery:'🔋',low_oxygen:'🫁',achievement:'🏆',medication:'💊',fall:'⚠️',general:'🔔'};
 
 function timeAgo(t){
     const d=Math.floor((Date.now()-new Date(t).getTime())/1000);
